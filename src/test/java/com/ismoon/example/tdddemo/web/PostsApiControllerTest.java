@@ -3,6 +3,7 @@ package com.ismoon.example.tdddemo.web;
 import com.ismoon.example.tdddemo.domain.posts.Posts;
 import com.ismoon.example.tdddemo.domain.posts.PostsRepository;
 import com.ismoon.example.tdddemo.web.dto.PostsSaveRequestDto;
+import com.ismoon.example.tdddemo.web.dto.PostsUpdateRequestDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -55,5 +58,36 @@ public class PostsApiControllerTest {
 
         assertThat(all.get(0).getTitle()).isEqualTo(title);
         assertThat(all.get(0).getContent()).isEqualTo(content);
+    }
+
+    @Test
+    public void postsUpdate() {
+        String title = "테스트 게시글";
+        String content = "테스트 본문";
+        Posts savedPosts = postsRepository.save(Posts.builder()
+                .title(title)
+                .content(content)
+                .author("insu4341@gmail.com")
+                .build()
+        );
+
+        Long updateId = savedPosts.getId();
+        String exceptedTitle = "title2";
+        String exceptedContent = "content2";
+        PostsUpdateRequestDto postsUpdateRequestDto = PostsUpdateRequestDto.builder()
+                .title(exceptedTitle)
+                .content(exceptedContent)
+                .build();
+        String url = "http://localhost:" + port + "/api/v1/posts/" + updateId;
+        HttpEntity<PostsUpdateRequestDto> requestEntity = new HttpEntity<>(postsUpdateRequestDto);
+        ResponseEntity<Long> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Long.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isGreaterThan(0L);
+
+        List<Posts> all = postsRepository.findAll();
+
+        assertThat(all.get(0).getTitle()).isEqualTo(exceptedTitle);
+        assertThat(all.get(0).getContent()).isEqualTo(exceptedContent);
     }
 }
