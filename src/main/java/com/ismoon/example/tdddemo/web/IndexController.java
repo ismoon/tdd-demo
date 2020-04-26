@@ -1,5 +1,6 @@
 package com.ismoon.example.tdddemo.web;
 
+import com.ismoon.example.tdddemo.config.auth.LoginUser;
 import com.ismoon.example.tdddemo.config.auth.dto.SessionUser;
 import com.ismoon.example.tdddemo.service.posts.PostsService;
 import lombok.RequiredArgsConstructor;
@@ -8,19 +9,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.servlet.http.HttpSession;
-
 @RequiredArgsConstructor
 @Controller
 public class IndexController {
 
     private final PostsService postsService;
-    private final HttpSession httpSession;
 
     @GetMapping("/")
 
-    public String index(Model model) {
-        SessionUser user = (SessionUser) httpSession.getAttribute("user");
+    public String index(Model model, @LoginUser SessionUser user) {
 
         if (user != null) {
             model.addAttribute("userName", user.getName());
