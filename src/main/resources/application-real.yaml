@@ -1,0 +1,9 @@
+server:
+  port: 30027
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  profiles:
+    include: oauth,real-db
+  session:
+    store-type: jdbc
